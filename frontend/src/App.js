@@ -1,5 +1,4 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-// import Home_old from "./pages/Home_old.jsx";
 import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
@@ -7,12 +6,14 @@ import Index from "./pages/Index.jsx";
 import QuizDashboard from "./pages/QuizDashboard.jsx";
 import Quiz from "./pages/Quiz.jsx";
 import Score from "./pages/Score.jsx";
+import History from "./pages/History.jsx";
 import styled from "styled-components";
 import { AuthContext } from "./Context.js";
 import { useEffect, useState } from "react";
 import { get } from "./services/Auth.js";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import RegistrationSuccess from "./pages/RegistrationSuccess";
+import Profile from "./pages/Profile";
 
 const MainComponent = styled.div`
   background-color: #282c34;
@@ -22,6 +23,7 @@ const MainComponent = styled.div`
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     get()
       .then(u => {
@@ -50,7 +52,6 @@ function App() {
       path: "/registration-success",
       element: <RegistrationSuccess />
     },
-
     {
       path: "/home",
       element: (
@@ -62,12 +63,11 @@ function App() {
     {
       path: "/score",
       element: (
-          <ProtectedRoute>
-            <Score />
-          </ProtectedRoute>
+        <ProtectedRoute>
+          <Score />
+        </ProtectedRoute>
       )
     },
-
     {
       path: "/dashboard",
       element: (
@@ -83,6 +83,22 @@ function App() {
           <Quiz />
         </ProtectedRoute>
       )
+    },
+    {
+      path: "/history",
+      element: (
+        <ProtectedRoute>
+          <History />
+        </ProtectedRoute>
+      )
+    },
+    {
+        path: "/profile",
+        element: (
+            <ProtectedRoute>
+                <Profile />
+            </ProtectedRoute>
+        )
     }
   ]);
 

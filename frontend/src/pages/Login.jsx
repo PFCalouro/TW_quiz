@@ -6,19 +6,24 @@ import { login } from "../services/Auth.js";
 import { useNavigate } from "react-router";
 import { useAuth } from "../Context.js";
 import { useEffect } from "react";
+import LogoImage from "../assets/Logo.png";
 
 const Title = styled.h1`
-    font-size: 64px;
-    font-weight: bolder;
-    margin-bottom: 10px;
+    font-size: 48px;
+    color: #f7ab1e;
+    margin-bottom: 40px;
 `;
 
 const Container = styled.div`
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    width: 30%;
+    padding: 40px 20px;
+    color: #333;
+    transition: margin-left 0.3s;
+    ${({ showNav }) => showNav && `
+        margin-left: 200px;
+    `}
 `;
 
 const Input = styled.input`
@@ -28,44 +33,49 @@ const Input = styled.input`
     border-radius: 8px;
     border: 1px solid grey;
     padding-left: 8px;
+    margin-bottom: 20px;
 `;
 
 const InputErrorLabel = styled.label`
     color: red;
     font-size: 12px;
+    margin-top: -15px;
+    margin-bottom: 15px;
 `;
 
-const SubmitButton = styled.button`
+const Button = styled.button`
     margin-top: 10px;
-    background-color: #61dbfb;
+    background-color: #007bff;
     color: white;
     height: 48px;
     width: 150px;
     font-size: large;
-    border-radius: 8px;
-    border: 1px solid grey;
-    padding-left: 8px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, transform 0.3s;
+
+    &:hover {
+        background-color: #0056b3;
+        transform: translateY(-5px);
+    }
 `;
 
-const InputContainer = styled.div`
+const FormContainer = styled.form`
     display: flex;
     flex-direction: column;
-    justify-content: start;
-    align-items: start;
-    margin-bottom: 20px ;
+    align-items: center;
 `;
 
-const RegisterButton = styled.button`
-    margin-top: 10px;
-    background-color: #ff6347;
-    color: white;
-    height: 48px;
+const Logo = styled.img`
     width: 150px;
-    font-size: large;
-    border-radius: 8px;
-    border: 1px solid grey;
-    padding-left: 8px;
-    margin-left: 10px; // add some spacing between the buttons
+    height: auto;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
 `;
 
 export default function Login() {
@@ -74,74 +84,68 @@ export default function Login() {
 
     useEffect(() => {
         if (user && !loading) {
-            // navigate("/home");
-            navigate("/login");
+            navigate("/home");
         }
     }, [user, loading, navigate]);
 
     return (
         <DefaultLayout>
             <Container>
+                <Logo src={LogoImage} alt="Quiz Logo" />
                 <Title>Login</Title>
-
                 <Formik
                     initialValues={{ username: '', password: '' }}
                     validationSchema={Yup.object({
-                        username: Yup.string()
-                            .required('Username is required'),
-                        password: Yup.string()
-                            .required('Password is required')
+                        username: Yup.string().required('Username is required'),
+                        password: Yup.string().required('Password is required'),
                     })}
                     onSubmit={async (values, { setSubmitting }) => {
                         setSubmitting(true);
                         const user = await login(values.username, values.password);
-
                         if (user) {
                             setUser(user);
                             navigate("/home");
                         } else {
-                            // TODO: Show a error message
+                            // TODO: Show an error message
                         }
                     }}
                 >
                     {({
-                          values,
-                          errors,
-                          touched,
-                          handleChange,
-                          handleBlur,
-                          handleSubmit,
-                          isSubmitting,
-                      }) => (
-                        <form onSubmit={handleSubmit}>
-                            <InputContainer>
-                                <Input
-                                    type="text"
-                                    placeholder="Username"
-                                    name="username"
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.username} />
-                                <InputErrorLabel>{errors.username && touched.username && errors.username}</InputErrorLabel>
-                            </InputContainer>
-                            <InputContainer>
-                                <Input
-                                    type="password"
-                                    placeholder="Password"
-                                    name="password"
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.password} />
-                                <InputErrorLabel>{errors.password && touched.password && errors.password}</InputErrorLabel>
-                            </InputContainer>
+                        values,
+                        errors,
+                        touched,
+                        handleChange,
+                        handleBlur,
+                        handleSubmit,
+                        isSubmitting,
+                    }) => (
+                        <FormContainer onSubmit={handleSubmit}>
+                            <Input
+                                type="text"
+                                placeholder="Username"
+                                name="username"
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                value={values.username}
+                            />
+                            <InputErrorLabel>{errors.username && touched.username && errors.username}</InputErrorLabel>
+                            <Input
+                                type="password"
+                                placeholder="Password"
+                                name="password"
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                value={values.password}
+                            />
+                            <InputErrorLabel>{errors.password && touched.password && errors.password}</InputErrorLabel>
                             <div>
-                                <SubmitButton type="submit" disabled={isSubmitting}>Entrar</SubmitButton>
-                                <RegisterButton type="button" onClick={() => navigate("/register")}>Registrar</RegisterButton>
+                                <Button type="submit" disabled={isSubmitting}>Entrar</Button>
+                                <Button type="button" onClick={() => navigate("/register")}>Registar</Button>
                             </div>
-                        </form>
+                        </FormContainer>
                     )}
                 </Formik>
             </Container>
         </DefaultLayout>
-    )
+    );
 }
