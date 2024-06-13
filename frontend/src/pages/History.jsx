@@ -56,12 +56,16 @@ const ScoreItem = styled.li`
     background-color: #007bff;
     color: white;
     padding: 10px;
-    margin: 10px 0;
+    margin: 20px 0;
     border-radius: 50px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 20px; 
+    letter-spacing: 0.05em;
+    margin-right: 20px;
 `;
+
 
 const PaginationContainer = styled.div`
     display: flex;
@@ -82,7 +86,8 @@ const History = () => {
     useEffect(() => {
         const fetchAllScores = async () => {
             try {
-                const response = await axios.get('http://localhost:8000/api/score/all');
+                //const response = await axios.get('http://localhost:8000/api/score/all');
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/score/all`);
                 setAllScores(response.data);
             } catch (error) {
                 console.error('Error fetching all scores:', error);
@@ -91,7 +96,7 @@ const History = () => {
 
         const fetchUserScores = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/api/score/user/${user.username}`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/score/user/${user.username}`);
                 setUserScores(response.data);
             } catch (error) {
                 console.error('Error fetching user scores:', error);
@@ -119,10 +124,10 @@ const History = () => {
     const renderScores = (scores) => (
         paginateScores(scores).map((score, index) => (
             <ScoreItem key={index}>
-                {showAllScores && <span>User: {score.username}</span>}
-                <span>Difficulty: {score.difficulty}</span>
-                <span>Score: {score.score}</span>
-                <span>Date: {new Date(score.createdAt).toLocaleString()}</span>
+                {showAllScores && <span>User {score.username}</span>}
+                <span>Difficulty {score.difficulty}</span>
+                <span>Score {score.score}</span>
+                <span>Date {new Date(score.createdAt).toLocaleString()}</span>
             </ScoreItem>
         ))
     );

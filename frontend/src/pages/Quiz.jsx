@@ -204,7 +204,7 @@ export default function Quiz() {
     const saveScore = async (score) => {
         const answersArray = Object.keys(answers).map(index => ({ questionIndex: index, answer: answers[index] }));
         try {
-            await axios.post('http://localhost:8000/api/score', { score, difficulty, username: user.username, answers: answersArray });
+            await axios.post(`${process.env.REACT_APP_API_URL}/score`, { score, difficulty, username: user.username, answers: answersArray });
             console.log('Score saved successfully');
         } catch (error) {
             console.error("Error saving score", error);
