@@ -63,12 +63,21 @@ const ScoreItem = styled.li`
     align-items: center;
 `;
 
+const PaginationContainer = styled.div`
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+`;
+
 const History = () => {
     const { user } = useContext(AuthContext);
     const navigate = useNavigate();
     const [allScores, setAllScores] = useState([]);
     const [userScores, setUserScores] = useState([]);
     const [showAllScores, setShowAllScores] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [scoresPerPage] = useState(5);
 
     useEffect(() => {
         const fetchAllScores = async () => {
@@ -97,35 +106,49 @@ const History = () => {
         navigate("/home");
     };
 
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    const paginateScores = (scores) => {
+        const indexOfLastScore = currentPage * scoresPerPage;
+        const indexOfFirstScore = indexOfLastScore - scoresPerPage;
+        return scores.slice(indexOfFirstScore, indexOfLastScore);
+    };
+
+    const renderScores = (scores) => (
+        paginateScores(scores).map((score, index) => (
+            <ScoreItem key={index}>
+                {showAllScores && <span>User: {score.username}</span>}
+                <span>Difficulty: {score.difficulty}</span>
+                <span>Score: {score.score}</span>
+                <span>Date: {new Date(score.createdAt).toLocaleString()}</span>
+            </ScoreItem>
+        ))
+    );
+
+    const scoresToShow = showAllScores ? allScores : userScores;
+    const totalPages = Math.ceil(scoresToShow.length / scoresPerPage);
+
     return (
         <DefaultLayout>
             <Container>
                 <Title>Histórico</Title>
                 <ButtonContainer>
-                    <Button onClick={() => setShowAllScores(true)}>Ranking Mundial</Button>
-                    <Button onClick={() => setShowAllScores(false)}>Ranking Solo</Button>
+                    <Button onClick={() => { setShowAllScores(true); setCurrentPage(1); }}>Ranking Mundial</Button>
+                    <Button onClick={() => { setShowAllScores(false); setCurrentPage(1); }}>Ranking Solo</Button>
                     <Button onClick={handleExit}>Sair</Button>
                 </ButtonContainer>
                 <ScoreList>
-                    {showAllScores ? (
-                        allScores.map((score, index) => (
-                            <ScoreItem key={index}>
-                                <span>User: {score.username}</span>
-                                <span>Difficulty: {score.difficulty}</span>
-                                <span>Score: {score.score}</span>
-                                <span>Date: {new Date(score.createdAt).toLocaleString()}</span>
-                            </ScoreItem>
-                        ))
-                    ) : (
-                        userScores.map((score, index) => (
-                            <ScoreItem key={index}>
-                                <span>Difficulty: {score.difficulty}</span>
-                                <span>Score: {score.score}</span>
-                                <span>Date: {new Date(score.createdAt).toLocaleString()}</span>
-                            </ScoreItem>
-                        ))
-                    )}
+                    {renderScores(scoresToShow)}
                 </ScoreList>
+                <PaginationContainer>
+                    {Array.from({ length: totalPages }, (_, i) => (
+                        <Button key={i + 1} onClick={() => handlePageChange(i + 1)}>
+                            {i + 1}
+                        </Button>
+                    ))}
+                </PaginationContainer>
             </Container>
         </DefaultLayout>
     );
