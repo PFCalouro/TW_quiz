@@ -6,69 +6,93 @@ import { register } from "../services/Auth.js";
 import { useNavigate } from "react-router";
 import { useEffect } from "react";
 import { useAuth } from "../Context.js";
+import LogoImage from "../assets/Logo.png";
+import * as PropTypes from "prop-types";
+
 
 const Title = styled.h1`
-    font-size: 32px;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #f4a261;
+    font-size: 48px;
+    color: #f7ab1e;
+    margin-bottom: 40px;
 `;
 
 const Container = styled.div`
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    width: 400px;
-    padding: 30px;
-    background-color: #0f044c;
-    border-radius: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    text-align: center;
+    padding: 40px 20px;
+    color: #333;
+    transition: margin-left 0.3s;
+    ${({ showNav }) => showNav && `
+        margin-left: 200px;
+    `}
 `;
-
 const Input = styled.input`
     height: 48px;
-    width: 100%;
+    width: 400px;
     font-size: large;
     border-radius: 8px;
     border: 1px solid grey;
     padding-left: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 `;
 
 const InputErrorLabel = styled.label`
     color: red;
     font-size: 12px;
-    margin-bottom: 10px;
+    margin-top: -15px;
+    margin-bottom: 15px;
 `;
 
-const SubmitButton = styled.button`
+const Button = styled.button`
     margin-top: 10px;
-    background-color: #f4a261;
+    background-color: #007bff;
     color: white;
     height: 48px;
-    width: 100%;
+    width: 150px;
     font-size: large;
-    border-radius: 8px;
+    border-radius: 50px;
     border: none;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    margin-right: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, transform 0.3s;
 
     &:hover {
-        background-color: #e76f51;
+        background-color: #0056b3;
+        transform: translateY(-5px);
     }
+`;
+
+const FormContainer = styled.form`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+`;
+
+const Logo = styled.img`
+    width: 150px;
+    height: auto;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
 `;
 
 const InputContainer = styled.div`
     display: flex;
     flex-direction: column;
-    width: 100%;
+    align-items: center;
 `;
+
+const ContainerFooter = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;`;
+
 
 export default function Register() {
     const { user, loading, setUser } = useAuth();
-    // const { user, loading } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -83,7 +107,6 @@ export default function Register() {
 
         if (registeredUser) {
             setUser(registeredUser);
-            // navigate("/login");
             navigate("/registration-success");
         } else {
             console.error("Registration failed");
@@ -91,14 +114,17 @@ export default function Register() {
 
         setSubmitting(false);
     };
+    const handleExit = () => {
+        navigate("/login");
+    };
 
     return (
         <DefaultLayout>
             <Container>
-                <Title>Register</Title>
-
+                <Logo src={LogoImage} alt="Quiz Logo" />
+                <Title>Registar</Title>
                 <Formik
-                    initialValues={{ username: '', email: '',firstName:'', lastName: '', password: '', confirmPassword: '' }}
+                    initialValues={{ username: '', email: '', firstName: '', lastName: '', password: '', confirmPassword: '' }}
                     validationSchema={Yup.object({
                         username: Yup.string().required('Username is required'),
                         email: Yup.string().email('Invalid email address').required('Email is required'),
@@ -112,16 +138,15 @@ export default function Register() {
                     onSubmit={handleSubmit}
                 >
                     {({
-                          values,
-                          errors,
-                          touched,
-                          handleChange,
-                          handleBlur,
-                          handleSubmit,
-                          isSubmitting,
-                      }) => (
-                        <form onSubmit={handleSubmit}>
-
+                        values,
+                        errors,
+                        touched,
+                        handleChange,
+                        handleBlur,
+                        handleSubmit,
+                        isSubmitting,
+                    }) => (
+                        <FormContainer onSubmit={handleSubmit}>
                             <InputContainer>
                                 <Input
                                     type="text"
@@ -142,7 +167,6 @@ export default function Register() {
                                     value={values.email} />
                                 <InputErrorLabel>{errors.email && touched.email && errors.email}</InputErrorLabel>
                             </InputContainer>
-
                             <InputContainer>
                                 <Input
                                     type="text"
@@ -183,8 +207,12 @@ export default function Register() {
                                     value={values.confirmPassword} />
                                 <InputErrorLabel>{errors.confirmPassword && touched.confirmPassword && errors.confirmPassword}</InputErrorLabel>
                             </InputContainer>
-                            <SubmitButton type="submit" disabled={isSubmitting}>Register</SubmitButton>
-                        </form>
+                            <ContainerFooter>
+                                <Button type="submit" disabled={isSubmitting}>Registar</Button>
+                                <Button type="submit" onClick={handleExit}>Sair</Button>
+                            </ContainerFooter>
+
+                        </FormContainer>
                     )}
                 </Formik>
             </Container>
